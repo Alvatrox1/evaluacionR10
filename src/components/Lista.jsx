@@ -9,6 +9,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import axios from 'axios';
+import moment from 'moment/moment';
 
 function Lista() {
 
@@ -26,10 +27,15 @@ function Lista() {
     const cargarListado = () => {
 
         let crearTabla = [];
-        let resultados = 0;
+        let arrayFecha = [];
 
         axios.get(endPoint).then((response) => {
-            // console.log("Datos : ", response.data.results);
+            console.log("Datos : ", response.data.results);
+            for (let i = 0; i < response.data.results.length; i++) {
+
+                arrayFecha[i] = moment.utc(response.data.results[i].lastreporttime).local();
+                response.data.results[i].lastreporttime = arrayFecha[i].format('DD/MM/YYYY');
+            }
             setListado(response.data.results);
         }).catch((error) => {
             console.log("Error", error);
@@ -37,32 +43,8 @@ function Lista() {
 
         setNumResultados( listado.length );
 
-        for (let i = 0; i < listado.length; i++) {
+        setTabla(listado);   
 
-            crearTabla[i] = {
-                "ID": listado[i]._id,
-                "ID Ciudad": listado[i].cityid,
-                "Nombre": listado[i].name,
-                "Estado": listado[i].state,
-                "Probabilidad de Precipitación": listado[i].probabilityofprecip,
-                "Humedad": listado[i].relativehumidity,
-                "Lastreporttime": listado[i].lastreporttime,
-
-            }
-
-            setTabla(crearTabla);
-
-            createData(crearTabla[i]);
-
-        }
-
-        console.log("Tabla : ", tabla);
-
-
-    }
-
-    function createData(id, idCiudad, nombre, estado, proPre, humedad, fecha) {
-        return { id, idCiudad, nombre, estado, proPre, humedad, fecha };
     }
 
     return (
